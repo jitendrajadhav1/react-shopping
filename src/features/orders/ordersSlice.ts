@@ -1,74 +1,67 @@
-// import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-// // import { getDb } from '../../lib/firebase'
-// import { selectBasketItems, selectBill } from '../basket/selectors'
-// import { RootState } from '../../store/store'
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
-// type Status = 'idle' | 'saving' | 'saved' | 'failed'
+import { selectBasketItems, selectBill } from "../basket/selectors";
+import { addItems, clearBasket } from "../basket/basketSlice";
+import type { RootState } from "../../store/store";
+import { db } from "../../lib/firebase";
 
-// interface OrdersState {
-//   status: Status
-//   lastOrderId: string | null
-//   error: string | null
-// }
+type Status = "idle" | "saving" | "saved" | "failed";
 
-// const initialState: OrdersState = {
-//   status: 'idle',
-//   lastOrderId: null,
-//   error: null,
-// }
+interface OrdersState {
+  status: Status;
+  lastOrderId: string | null;
+  error: string | null;
+}
 
-// export const saveOrder = createAsyncThunk<string, void, { state: RootState }>(
-//   'orders/save',
-//   async (_, { getState, dispatch }) => {
-//     const state = getState()
-//     const bill = selectBill(state)
+const initialState: OrdersState = {
+  status: "idle",
+  lastOrderId: null,
+  error: null,
+};
 
-//     const db = await getDb()
-//     const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
+export const saveOrder = createAsyncThunk<string, void, { state: RootState }>(
+  "orders/save",
+  async (_, { getState, dispatch }) => {
+    const state = getState();
+    const bill = selectBill(state);
 
-//     const ref = await addDoc(collection(db, 'orders'), {
-//       items: selectBasketItems(state),
-//       subTotal: bill.subTotal,
-//       savings: bill.totalSavings,
-//       total: bill.total,
-//       createdAt: serverTimestamp(),
-//     })
+    const ref = await addDoc(collection(db, "orders"), {
+      items: selectBasketItems(state),
+      subTotal: bill.subTotal,
+      savings: bill.totalSavings,
+      total: bill.total,
+      createdAt: serverTimestamp(),
+    });
 
-//     dispatch(clearBasket())
-//     return ref.id
-//   },
-// )
+    dispatch(clearBasket());
+    return ref.id;
+  },
+);
 
-// const ordersSlice = createSlice({
-//   name: 'orders',
-//   initialState,
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(saveOrder.pending, (state) => {
-//         state.status = 'saving'
-//         state.error = null
-//       })
-//       .addCase(saveOrder.fulfilled, (state, action) => {
-//         state.status = 'saved'
-//         state.lastOrderId = action.payload
-//       })
-//       .addCase(saveOrder.rejected, (state, action) => {
-//         state.status = 'failed'
-//         state.error = action.error.message ?? 'Could not save the order'
-//       })
-//       // once they start a new basket the "saved" message is stale
-//       .addCase(addItem, (state) => {
-//         if (state.status === 'saved') state.status = 'idle'
-//       })
-//   },
-// })
+const ordersSlice = createSlice({
+  name: "orders",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(saveOrder.pending, (state) => {
+        state.status = "saving";
+        state.error = null;
+      })
+      .addCase(saveOrder.fulfilled, (state, action) => {
+        state.status = "saved";
+        state.lastOrderId = action.payload;
+      })
+      .addCase(saveOrder.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message ?? "Could not save the order";
+      })
+      // once they start a new basket the "saved" message is stale
+      .addCase(addItems, (state) => {
+        if (state.status === "saved") state.status = "idle";
+      });
+  },
+});
 
-// export default ordersSlice.reducer
-
-import React from 'react'
-
-const ordersSlice = () => {
-  }
-
-export default ordersSlice
+export default ordersSlice.reducer;

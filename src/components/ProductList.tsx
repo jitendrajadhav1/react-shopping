@@ -2,6 +2,8 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectBasketItems } from "../features/basket/selectors";
 import { products } from "../data/products";
+import { formatPrice } from "../utils/money";
+import { addItems } from "../features/basket/basketSlice";
 
 const ProductList: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -20,9 +22,15 @@ const ProductList: React.FC = () => {
             <li key={product.id} className="flex items-center gap-4 py-3">
               <span className="flex-1">{product.name}</span>
               <span className="tabular-nums text-stone-600">
-                {product.price}
+                {formatPrice(product.price)}
               </span>
-              <button className="w-20 rounded-md bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white disabled:bg-stone-300">
+              <button
+                type="button"
+                onClick={() => dispatch(addItems(product.id))}
+                disabled={inBasket}
+                aria-label={`Add ${product.name}`}
+                className="w-20 rounded-md bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white disabled:bg-stone-300"
+              >
                 {inBasket ? "Added" : "Add"}
               </button>
             </li>

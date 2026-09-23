@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ProductId } from "../../data/products";
-import Basket from "../../components/Basket";
 import { BasketItems } from "../../utils/offers";
 
 interface BasketState {
-  items: BasketItems
+  items: BasketItems;
 }
 
 const initialState: BasketState = {
@@ -12,7 +11,7 @@ const initialState: BasketState = {
 };
 
 const basketSlice = createSlice({
-  name: 'basket',
+  name: "basket",
   initialState,
   reducers: {
     addItems(state, action: PayloadAction<ProductId>) {
@@ -29,10 +28,10 @@ const basketSlice = createSlice({
       }
     },
     clearBasket(state) {
-        state.items = {}
+      state.items = {};
     },
   },
 });
 
-export const { addItems, removeItem, clearBasket } = basketSlice.actions
-export default basketSlice.reducer
+export const { addItems, removeItem, clearBasket } = basketSlice.actions;
+export default basketSlice.reducer;

@@ -11,7 +11,7 @@ export interface AppliedOffer {
   saving: number;
 }
 
-export interface BillLine {
+export interface CartRow {
   product: Product;
   quantity: number;
   price: number;
@@ -20,7 +20,7 @@ export interface BillLine {
 }
 
 export interface Bill {
-  lines: BillLine[];
+  rows: CartRow[];
   subTotal: number;
   totalSavings: number;
   total: number;
@@ -30,7 +30,7 @@ export function calculateBill(
   items: BasketItems,
   offers: Offer[] = defaultOffers,
 ): Bill {
-  const lines: BillLine[] = [];
+  const rows: CartRow[] = [];
   for (const product of products) {
     const quantity = items[product.id] ?? 0;
     if (quantity <= 0) continue;
@@ -47,11 +47,11 @@ export function calculateBill(
 
     const saved = savings.reduce((sum, s) => sum + s.saving, 0);
 
-    lines.push({ product, quantity, price, savings, cost: price - saved });
+    rows.push({ product, quantity, price, savings, cost: price - saved });
   }
 
-  const subTotal = lines.reduce((sum, line) => sum + line.price, 0);
-  const total = lines.reduce((sum, line) => sum + line.cost, 0);
+  const subTotal = rows.reduce((sum, row) => sum + row.price, 0);
+  const total = rows.reduce((sum, row) => sum + row.cost, 0);
 
-  return { lines, subTotal, totalSavings: subTotal - total, total };
+  return { rows, subTotal, totalSavings: subTotal - total, total };
 }
