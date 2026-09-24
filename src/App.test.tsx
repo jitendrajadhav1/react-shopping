@@ -10,7 +10,7 @@ jest.mock("./lib/firebase", () => ({ db: {} }));
 describe("App", () => {
   it("renders the heading", () => {
     renderWithStore(<App />);
-    expect(screen.getByText(/React Assingment/i)).toBeInTheDocument();
+    expect(screen.getByText(/React Assignment/i)).toBeInTheDocument();
   });
 
   it("shows all 5 products", () => {
